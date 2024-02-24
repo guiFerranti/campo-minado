@@ -1,7 +1,8 @@
 import React from 'react';
 import params from '../param';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Mine from './Mine';
+import Flag from './Flag';
 
 const styles = StyleSheet.create({
     field: {
@@ -29,17 +30,21 @@ const styles = StyleSheet.create({
     exploded: {
         backgroundColor: "#ff0000",
         borderColor: "#ff0000",
+    },
+    flagged: {
+
     }
 })
 
 export default props => {
-    const { mined, opened, nearMines, exploded } = props
+    const { mined, opened, nearMines, exploded, flagged } = props
     const styleField = [styles.field]
 
     if (opened) styleField.push(styles.opened)
     if (exploded) styleField.push(styles.exploded)
+    if (flagged) styleField.push(styles.flagged)
 
-    if (styleField.length == 1) styleField.push(styles.regular)
+    if (!opened && !exploded) styleField.push(styles.regular)
 
     let color = null
     if (nearMines > 0) {
@@ -50,12 +55,15 @@ export default props => {
     }
 
     return (
-        <View style={styleField}>
-            {!mined && opened && nearMines > 0 ?
-                <Text style={[styles.label, { color: color }]}>
-                    { nearMines } 
-                </Text> : false}
+        <TouchableWithoutFeedback onPress={props.onOpen} onLongPress={props.onSelect}>
+            <View style={styleField}>
+                {!mined && opened && nearMines > 0 ?
+                    <Text style={[styles.label, { color: color }]}>
+                        { nearMines } 
+                    </Text> : false}
                 {mined && opened ? <Mine /> : false}
-        </View>
+                {flagged && !opened ? <Flag /> : false}
+            </View>
+        </TouchableWithoutFeedback>
     )
 }
